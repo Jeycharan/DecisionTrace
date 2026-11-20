@@ -1,0 +1,150 @@
+{
+  "info": {
+    "name": "DecisionTrace API",
+    "_postman_id": "decisiontrace-v1-collection",
+    "description": "Collection of API endpoints for DecisionTrace financial decision audit platform.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "apiKey",
+      "value": "YOUR_API_KEY_HERE",
+      "type": "string"
+    },
+    {
+      "key": "authToken",
+      "value": "YOUR_JWT_TOKEN_HERE",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["health"]
+        }
+      }
+    },
+    {
+      "name": "Staff Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"auditor@demo-bank.com\",\n  \"password\": \"Auditor@123\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["auth", "login"]
+        }
+      }
+    },
+    {
+      "name": "Ingest Event",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-API-Key", "value": "{{apiKey}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"eventId\": \"evt_postman_0001\",\n  \"schemaVersion\": 1,\n  \"tenantId\": \"demo-bank\",\n  \"caseId\": \"loan_case_1001\",\n  \"sourceSystem\": \"postman-client\",\n  \"eventType\": \"DECISION_MADE\",\n  \"occurredAt\": \"2026-11-20T12:00:00.000Z\",\n  \"caseType\": \"LOAN\",\n  \"subjectRef\": \"subj_demo_1001\",\n  \"payload\": {\n    \"application\": { \"requestedAmount\": 500000 },\n    \"decision\": { \"outcome\": \"MANUAL_REVIEW\", \"riskScore\": 82 },\n    \"rules\": { \"rulesetId\": \"loan-policy\", \"rulesetVersion\": \"1.0.0\" }\n  }\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/events",
+          "host": ["{{baseUrl}}"],
+          "path": ["events"]
+        }
+      }
+    },
+    {
+      "name": "List Cases",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{authToken}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/cases?page=1&limit=20",
+          "host": ["{{baseUrl}}"],
+          "path": ["cases"],
+          "query": [
+            { "key": "page", "value": "1" },
+            { "key": "limit", "value": "20" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get Case Detail",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{authToken}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/cases/loan_case_1001",
+          "host": ["{{baseUrl}}"],
+          "path": ["cases", "loan_case_1001"]
+        }
+      }
+    },
+    {
+      "name": "Get Case Events Timeline",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{authToken}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/cases/loan_case_1001/events",
+          "host": ["{{baseUrl}}"],
+          "path": ["cases", "loan_case_1001", "events"]
+        }
+      }
+    },
+    {
+      "name": "Verify Case Integrity",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{authToken}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/cases/loan_case_1001/verify",
+          "host": ["{{baseUrl}}"],
+          "path": ["cases", "loan_case_1001", "verify"]
+        }
+      }
+    },
+    {
+      "name": "List Case Checkpoints",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{authToken}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/cases/loan_case_1001/checkpoints",
+          "host": ["{{baseUrl}}"],
+          "path": ["cases", "loan_case_1001", "checkpoints"]
+        }
+      }
+    }
+  ]
+}
