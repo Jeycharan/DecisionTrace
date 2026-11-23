@@ -101,35 +101,16 @@ export async function ingestEvent(input: EventIngestionInput): Promise<IngestRes
     }
   }
 
-  // 2. Use a session for transactional safety
+  // 2. Execute with transaction when supported (replica set), fallback to non-transactional for standalone MongoDB
   const session = await mongoose.startSession();
+  let supportsTx = true;
   try {
     let result: IngestResult | null = null;
 
-    await session.withTransaction(async () => {
+    const executeIngest = async (activeSession: mongoose.ClientSession | null): Promise<IngestResult> => {
+      const opts = activeSession ? { session: activeSession } : {};
+
       // 3. Upsert case
-      let caseDoc = await CaseModel.findOne({
-        tenantId: input.tenantId,
-        caseId: input.caseId,
-      }).session(session);
-
-      const isNewCase = !caseDoc;
-      if (isNewCase) {
-        caseDoc = new CaseModel({
-          tenantId: input.tenantId,
-          caseId: input.caseId,
-          caseType: input.caseType,
-          subjectRef: input.subjectRef,
-          status: 'OPEN',
-          latestDecision: null,
-          latestRiskScore: null,
-          eventCount: 0,
-          firstEventAt: recordedAt,
-          lastEventAt: recordedAt,
-          latestEventHash: null,
-        });
-      }
-
       // 4. Allocate next sequence atomically
       // Use findOneAndUpdate for atomic increment to prevent race conditions
       const updatedCase = await CaseModel.findOneAndUpdate(
@@ -149,7 +130,7 @@ export async function ingestEvent(input: EventIngestionInput): Promise<IngestRes
             lastEventAt: recordedAt,
           },
         },
-        { upsert: true, new: true, session }
+        { upsert: true, new: true, ...opts }
       );
 
       const sequence = updatedCase.eventCount; // eventCount after increment = new sequence
@@ -157,10 +138,11 @@ export async function ingestEvent(input: EventIngestionInput): Promise<IngestRes
       // 5. Get previous hash
       const previousEvent = await LedgerEventModel.findOne(
         { tenantId: input.tenantId, caseId: input.caseId, sequence: sequence - 1 },
-        { eventHash: 1 }
-      ).session(session).lean();
+        { eventHash: 1 },
+        opts
+      ).lean();
 
-      const previousHash = previousEvent ? previousEvent.eventHash : GENESIS_HASH;
+      const previousHash = previousEvent ? (previousEvent as any).eventHash : GENESIS_HASH;
 
       // 6. Create snapshot if needed
       let snapshotId: string | null = null;
@@ -188,7 +170,7 @@ export async function ingestEvent(input: EventIngestionInput): Promise<IngestRes
             ...snapshotData,
             snapshotHash,
           }],
-          { session }
+          opts
         );
       }
 
@@ -228,7 +210,7 @@ export async function ingestEvent(input: EventIngestionInput): Promise<IngestRes
           eventHash,
           hashAlgorithm: 'SHA-256',
         }],
-        { session }
+        opts
       );
 
       // 9. Update case projection
@@ -247,7 +229,7 @@ export async function ingestEvent(input: EventIngestionInput): Promise<IngestRes
       await CaseModel.updateOne(
         { tenantId: input.tenantId, caseId: input.caseId },
         { $set: caseUpdate },
-        { session }
+        opts
       );
 
       // 10. Create checkpoint if threshold reached
@@ -280,7 +262,7 @@ export async function ingestEvent(input: EventIngestionInput): Promise<IngestRes
             keyId,
             signature,
           }],
-          { session }
+          opts
         );
 
         checkpointCreated = true;
@@ -292,7 +274,7 @@ export async function ingestEvent(input: EventIngestionInput): Promise<IngestRes
         });
       }
 
-      result = {
+      return {
         accepted: true,
         eventId: input.eventId,
         caseId: input.caseId,
@@ -302,10 +284,26 @@ export async function ingestEvent(input: EventIngestionInput): Promise<IngestRes
         snapshotId: snapshotId || undefined,
         checkpointCreated,
       };
-    });
+    };
+
+    try {
+      await session.withTransaction(async () => {
+        result = await executeIngest(session);
+      });
+    } catch (txErr: any) {
+      if (
+        txErr?.message?.includes('replica set') ||
+        txErr?.message?.includes('Transaction numbers are only allowed')
+      ) {
+        supportsTx = false;
+        result = await executeIngest(null);
+      } else {
+        throw txErr;
+      }
+    }
 
     if (!result) {
-      throw new AppError(500, 'INTERNAL_ERROR', 'Transaction completed but no result was produced');
+      throw new AppError(500, 'INTERNAL_ERROR', 'Event ingestion failed to produce a result');
     }
 
     return result;

@@ -12,8 +12,8 @@
     "test:web": "cd apps/web && npm test",
     "lint:api": "cd apps/api && npm run lint",
     "lint:web": "cd apps/web && npm run lint",
-    "seed": "cd apps/api && npx ts-node ../scripts/seed-demo.ts",
-    "send-events": "cd apps/api && npx ts-node ../scripts/send-sample-events.ts"
+    "seed": "cd apps/api && npm run seed",
+    "send-events": "cd apps/api && npx tsx ../../scripts/send-sample-events.ts"
   },
   "keywords": ["audit", "compliance", "fintech", "decision-trace"],
   "license": "MIT"
