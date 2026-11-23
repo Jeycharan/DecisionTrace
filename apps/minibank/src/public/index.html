@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MiniBank - Instant Personal Loans</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    code, .font-mono { font-family: 'JetBrains Mono', monospace; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen">
+  <!-- Top Navigation -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30">
+    <div class="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-emerald-600 text-white font-bold flex items-center justify-center text-lg shadow-sm">
+          MB
+        </div>
+        <div>
+          <span class="font-bold text-slate-900 tracking-tight">MiniBank</span>
+          <span class="text-[11px] text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded-full ml-2 border border-emerald-200">Live Decision Engine</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-3 text-xs">
+        <span class="text-slate-500 hidden sm:inline">Audit trail powered by:</span>
+        <a href="http://localhost:3000" target="_blank" class="inline-flex items-center gap-1.5 font-semibold text-sky-700 bg-sky-50 hover:bg-sky-100 border border-sky-200 px-3 py-1.5 rounded-lg transition-colors">
+          <span>DecisionTrace UI</span>
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Hero & Form Container -->
+  <main class="max-w-3xl mx-auto px-4 py-10">
+    <div class="text-center mb-8">
+      <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Instant Loan Application</h1>
+      <p class="text-slate-500 text-sm mt-2 max-w-lg mx-auto">
+        Apply for personal or business credit with real-time automated rule evaluation. Every decision is cryptographically anchored to DecisionTrace.
+      </p>
+    </div>
+
+    <!-- Loan Application Form Card -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden p-6 sm:p-8">
+      <form id="loanForm" class="space-y-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <!-- Applicant Full Name -->
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+              Applicant Full Name
+            </label>
+            <input
+              type="text"
+              id="applicantName"
+              required
+              placeholder="e.g. Priya Sharma"
+              class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
+              value="Priya Sharma"
+            />
+          </div>
+
+          <!-- Monthly Income -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+              Monthly Gross Income (INR)
+            </label>
+            <div class="relative">
+              <span class="absolute left-3.5 top-2.5 text-slate-400 text-sm">₹</span>
+              <input
+                type="number"
+                id="monthlyIncome"
+                required
+                min="10000"
+                step="1000"
+                placeholder="75000"
+                class="w-full pl-8 pr-3.5 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
+                value="90000"
+              />
+            </div>
+            <span class="text-[11px] text-slate-400 mt-1 block">Minimum gross income ₹10,000</span>
+          </div>
+
+          <!-- Requested Loan Amount -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+              Requested Loan Amount (INR)
+            </label>
+            <div class="relative">
+              <span class="absolute left-3.5 top-2.5 text-slate-400 text-sm">₹</span>
+              <input
+                type="number"
+                id="requestedAmount"
+                required
+                min="50000"
+                max="5000000"
+                step="10000"
+                placeholder="300000"
+                class="w-full pl-8 pr-3.5 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
+                value="400000"
+              />
+            </div>
+            <span class="text-[11px] text-slate-400 mt-1 block">Tenure: 12 - 60 months</span>
+          </div>
+
+          <!-- Existing Debt / Outstanding Loans -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+              Existing Outstanding Loans (INR)
+            </label>
+            <div class="relative">
+              <span class="absolute left-3.5 top-2.5 text-slate-400 text-sm">₹</span>
+              <input
+                type="number"
+                id="existingDebt"
+                required
+                min="0"
+                step="5000"
+                placeholder="0"
+                class="w-full pl-8 pr-3.5 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
+                value="80000"
+              />
+            </div>
+            <span class="text-[11px] text-slate-400 mt-1 block">Car, home loan or personal credit balance</span>
+          </div>
+
+          <!-- Credit Score -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+              Credit Bureau Score (300 - 900)
+            </label>
+            <input
+              type="number"
+              id="creditScore"
+              required
+              min="300"
+              max="900"
+              placeholder="720"
+              class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
+              value="740"
+            />
+            <span class="text-[11px] text-slate-400 mt-1 block">CIBIL / Experian score</span>
+          </div>
+
+          <!-- Bank Account Tenure -->
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+              Primary Bank Account Age (Months)
+            </label>
+            <input
+              type="number"
+              id="accountAgeMonths"
+              required
+              min="1"
+              max="240"
+              placeholder="24"
+              class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
+              value="36"
+            />
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          id="submitBtn"
+          class="w-full py-3 px-4 rounded-xl font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition-colors shadow-sm flex items-center justify-center gap-2 text-sm"
+        >
+          <span>Submit & Evaluate Decision</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+        </button>
+      </form>
+
+      <!-- Processing State -->
+      <div id="loadingState" class="hidden py-10 text-center space-y-3">
+        <div class="w-10 h-10 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin mx-auto"></div>
+        <p class="text-sm font-semibold text-slate-700">Evaluating underwriting policy rules...</p>
+        <p class="text-xs text-slate-400 font-mono">Publishing cryptographic flight recorder events to DecisionTrace</p>
+      </div>
+
+      <!-- Decision Result Card (Populated Dynamically) -->
+      <div id="resultCard" class="hidden mt-8 pt-6 border-t border-slate-200 space-y-5"></div>
+    </div>
+  </main>
+
+  <script>
+    const form = document.getElementById('loanForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const loadingState = document.getElementById('loadingState');
+    const resultCard = document.getElementById('resultCard');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const payload = {
+        applicantName: document.getElementById('applicantName').value,
+        monthlyIncome: parseFloat(document.getElementById('monthlyIncome').value),
+        requestedAmount: parseFloat(document.getElementById('requestedAmount').value),
+        existingDebt: parseFloat(document.getElementById('existingDebt').value),
+        creditScore: parseInt(document.getElementById('creditScore').value, 10),
+        accountAgeMonths: parseInt(document.getElementById('accountAgeMonths').value, 10),
+      };
+
+      form.classList.add('hidden');
+      loadingState.classList.remove('hidden');
+      resultCard.classList.add('hidden');
+
+      try {
+        const response = await fetch('/api/apply', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+
+        const data = await response.json();
+        loadingState.classList.add('hidden');
+        resultCard.classList.remove('hidden');
+
+        if (!response.ok) {
+          resultCard.innerHTML = `
+            <div class="p-4 bg-rose-50 border border-rose-200 rounded-xl text-rose-800 text-sm">
+              <strong class="font-bold">Application Error:</strong> ${data.error || 'Failed to process application'}
+            </div>
+            <button onclick="resetForm()" class="text-xs font-semibold text-slate-600 hover:text-slate-900 mt-2">← Try Again</button>
+          `;
+          return;
+        }
+
+        const isApproved = data.decision.outcome === 'APPROVED';
+        const isRejected = data.decision.outcome === 'REJECTED';
+        const badgeColor = isApproved ? 'bg-emerald-50 text-emerald-800 border-emerald-300' : isRejected ? 'bg-rose-50 text-rose-800 border-rose-300' : 'bg-amber-50 text-amber-800 border-amber-300';
+
+        resultCard.innerHTML = `
+          <div class="p-5 rounded-2xl border ${badgeColor} space-y-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <span class="text-[10px] uppercase font-bold tracking-wider opacity-70">Underwriting Outcome</span>
+                <h3 class="text-2xl font-black">${data.decision.outcome}</h3>
+              </div>
+              <div class="text-right">
+                <span class="text-[10px] uppercase font-bold tracking-wider opacity-70">Risk Score</span>
+                <div class="text-xl font-mono font-bold">${data.decision.riskScore}/100</div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 text-xs pt-2 border-t border-current/10">
+              <div>
+                <span class="opacity-70 block">Calculated DTI:</span>
+                <strong class="font-mono text-sm">${data.decision.dtiRatio}%</strong>
+              </div>
+              <div>
+                <span class="opacity-70 block">Approved Limit:</span>
+                <strong class="font-mono text-sm">${data.decision.approvedAmount ? 'INR ' + Number(data.decision.approvedAmount).toLocaleString() : 'N/A'}</strong>
+              </div>
+            </div>
+
+            ${data.decision.reasonCodes.length > 0 ? `
+              <div class="text-xs">
+                <span class="opacity-70 block text-[11px] uppercase font-semibold mb-1">Reason Codes:</span>
+                <div class="flex flex-wrap gap-1">
+                  ${data.decision.reasonCodes.map(r => `<span class="px-2 py-0.5 rounded bg-white/70 font-mono text-[11px] font-medium">${r}</span>`).join('')}
+                </div>
+              </div>
+            ` : ''}
+          </div>
+
+          <!-- DecisionTrace Integration Box -->
+          <div class="p-4 bg-slate-900 text-slate-100 rounded-xl space-y-3 font-mono text-xs">
+            <div class="flex items-center justify-between text-slate-400 text-[11px] border-b border-slate-800 pb-2">
+              <span class="font-bold text-sky-400 flex items-center gap-1.5">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                DecisionTrace Audit Chain Created
+              </span>
+              <span>Events: ${data.audit.eventsDispatched}</span>
+            </div>
+
+            <div class="space-y-1">
+              <div class="text-slate-400 text-[10px]">CASE ID:</div>
+              <div class="text-emerald-400 font-bold select-all">${data.audit.caseId}</div>
+            </div>
+
+            <div class="space-y-1">
+              <div class="text-slate-400 text-[10px]">LATEST SHA-256 HASH:</div>
+              <div class="text-slate-300 text-[11px] truncate">${data.audit.latestEventHash}</div>
+            </div>
+
+            <div class="pt-2">
+              <a
+                href="${data.audit.decisionTraceUrl}"
+                target="_blank"
+                class="inline-flex items-center justify-center gap-2 w-full py-2.5 px-3 bg-sky-600 hover:bg-sky-500 text-white rounded-lg font-sans font-bold text-xs transition-colors"
+              >
+                Inspect Flight Recorder in DecisionTrace Dashboard →
+              </a>
+            </div>
+          </div>
+
+          <div class="text-center pt-2">
+            <button onclick="resetForm()" class="text-xs font-semibold text-slate-500 hover:text-slate-800">
+              ← Submit Another Loan Application
+            </button>
+          </div>
+        `;
+      } catch (err) {
+        loadingState.classList.add('hidden');
+        resultCard.classList.remove('hidden');
+        resultCard.innerHTML = `
+          <div class="p-4 bg-rose-50 border border-rose-200 rounded-xl text-rose-800 text-sm">
+            <strong class="font-bold">Network / Server Error:</strong> ${err.message}
+          </div>
+          <button onclick="resetForm()" class="text-xs font-semibold text-slate-600 hover:text-slate-900 mt-2">← Try Again</button>
+        `;
+      }
+    });
+
+    function resetForm() {
+      form.classList.remove('hidden');
+      resultCard.classList.add('hidden');
+      loadingState.classList.add('hidden');
+    }
+  </script>
+</body>
+</html>

@@ -6,6 +6,7 @@
   "scripts": {
     "dev:api": "cd apps/api && npm run dev",
     "dev:web": "cd apps/web && npm run dev",
+    "dev:minibank": "cd apps/minibank && npm run dev",
     "build:api": "cd apps/api && npm run build",
     "build:web": "cd apps/web && npm run build",
     "test:api": "cd apps/api && npm test",
@@ -13,6 +14,8 @@
     "lint:api": "cd apps/api && npm run lint",
     "lint:web": "cd apps/web && npm run lint",
     "seed": "cd apps/api && npm run seed",
+    "seed:cases": "cd apps/api && npm run seed:cases",
+    "test:tamper": "cd apps/api && npm run test:tamper",
     "send-events": "cd apps/api && npx tsx ../../scripts/send-sample-events.ts"
   },
   "keywords": ["audit", "compliance", "fintech", "decision-trace"],

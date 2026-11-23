@@ -6,6 +6,9 @@ export interface ICase extends Document {
   caseType: 'LOAN' | 'PAYMENT' | 'INSURANCE' | 'KYC' | 'OTHER';
   subjectRef: string;
   status: 'OPEN' | 'UNDER_REVIEW' | 'APPROVED' | 'REJECTED' | 'CLOSED';
+  initialDecision: string | null;
+  finalDecision: string | null;
+  isOverridden: boolean;
   latestDecision: string | null;
   latestRiskScore: number | null;
   eventCount: number;
@@ -32,6 +35,9 @@ const caseSchema = new Schema<ICase>(
       enum: ['OPEN', 'UNDER_REVIEW', 'APPROVED', 'REJECTED', 'CLOSED'],
       default: 'OPEN',
     },
+    initialDecision: { type: String, default: null },
+    finalDecision: { type: String, default: null },
+    isOverridden: { type: Boolean, default: false },
     latestDecision: { type: String, default: null },
     latestRiskScore: { type: Number, default: null },
     eventCount: { type: Number, default: 0 },

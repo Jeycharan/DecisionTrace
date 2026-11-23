@@ -16,13 +16,15 @@ export const GENESIS_HASH = 'GENESIS';
  */
 export function canonicalise(obj: Record<string, unknown>): string {
   return JSON.stringify(obj, (_key, value) => {
-    if (value === undefined) return null;
+    if (value === undefined) return undefined;
     if (value instanceof Date) return value.toISOString();
     if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
       // Sort keys deterministically
       const sorted: Record<string, unknown> = {};
       for (const k of Object.keys(value).sort()) {
-        sorted[k] = (value as Record<string, unknown>)[k];
+        if ((value as Record<string, unknown>)[k] !== undefined) {
+          sorted[k] = (value as Record<string, unknown>)[k];
+        }
       }
       return sorted;
     }

@@ -223,7 +223,21 @@ export async function ingestEvent(input: EventIngestionInput): Promise<IngestRes
       };
 
       if (statusUpdate) caseUpdate.status = statusUpdate;
-      if (decision?.outcome) caseUpdate.latestDecision = decision.outcome;
+      if (decision?.outcome) {
+        caseUpdate.latestDecision = decision.outcome;
+        caseUpdate.initialDecision = decision.outcome;
+      }
+      if (input.eventType === 'DECISION_OVERRIDDEN') {
+        const override = input.payload?.override as Record<string, unknown> | undefined;
+        if (override?.newOutcome) {
+          caseUpdate.latestDecision = override.newOutcome;
+          caseUpdate.finalDecision = override.newOutcome;
+          caseUpdate.isOverridden = true;
+          if (override.originalOutcome) {
+            caseUpdate.initialDecision = override.originalOutcome;
+          }
+        }
+      }
       if (decision?.riskScore != null) caseUpdate.latestRiskScore = decision.riskScore;
 
       await CaseModel.updateOne(
@@ -261,6 +275,7 @@ export async function ingestEvent(input: EventIngestionInput): Promise<IngestRes
             signatureAlgorithm: 'HMAC-SHA-256',
             keyId,
             signature,
+            createdAt: recordedAt,
           }],
           opts
         );

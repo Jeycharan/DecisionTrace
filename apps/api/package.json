@@ -12,6 +12,8 @@
     "test:watch": "vitest",
     "lint": "eslint src/ --ext .ts",
     "seed": "ts-node --transpile-only src/scripts/seed.ts",
+    "seed:cases": "ts-node --transpile-only src/scripts/seed-6-cases.ts",
+    "test:tamper": "ts-node --transpile-only src/scripts/test-tamper-detection.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

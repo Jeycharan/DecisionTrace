@@ -134,7 +134,7 @@ export const CasesList: React.FC<CasesListProps> = ({ onSelectCase }) => {
                   <th className="py-3 px-4">Type</th>
                   <th className="py-3 px-4">Subject Ref</th>
                   <th className="py-3 px-4">Status</th>
-                  <th className="py-3 px-4">Latest Decision</th>
+                  <th className="py-3 px-4">Decision Outcome</th>
                   <th className="py-3 px-4">Risk Score</th>
                   <th className="py-3 px-4">Events</th>
                   <th className="py-3 px-4">Last Activity</th>
@@ -174,8 +174,14 @@ export const CasesList: React.FC<CasesListProps> = ({ onSelectCase }) => {
                         {c.status}
                       </span>
                     </td>
-                    <td className="py-3.5 px-4 font-medium text-slate-800">
-                      {c.latestDecision || '—'}
+                    <td className="py-3.5 px-4">
+                      {c.isOverridden && c.initialDecision && c.finalDecision ? (
+                        <span className="text-purple-900 font-semibold text-xs">
+                          Initial: <span className="font-mono">{c.initialDecision}</span> → Final: <span className="font-mono">{c.finalDecision}</span> <span className="text-[10px] bg-purple-100 text-purple-800 px-1.5 py-0.5 rounded font-bold uppercase">(override)</span>
+                        </span>
+                      ) : (
+                        <span className="font-medium text-slate-800">{c.latestDecision || '—'}</span>
+                      )}
                     </td>
                     <td className="py-3.5 px-4 font-mono text-xs text-slate-700">
                       {c.latestRiskScore != null ? `${c.latestRiskScore}/100` : '—'}

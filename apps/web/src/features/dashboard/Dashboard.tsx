@@ -92,7 +92,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectCase, onNavigateTo
 
         <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
           <div className="flex items-center justify-between text-slate-500">
-            <span className="text-sm font-medium">Immutable Events</span>
+            <span className="text-sm font-medium">Hash-chained events</span>
             <Layers className="w-5 h-5 text-indigo-500" />
           </div>
           <div className="mt-3 text-3xl font-bold text-indigo-600">{loading ? '—' : totalEvents}</div>
@@ -134,7 +134,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectCase, onNavigateTo
                   <th className="py-3 px-4">Type</th>
                   <th className="py-3 px-4">Subject</th>
                   <th className="py-3 px-4">Status</th>
-                  <th className="py-3 px-4">Latest Outcome</th>
+                  <th className="py-3 px-4">Decision Outcome</th>
                   <th className="py-3 px-4">Risk Score</th>
                   <th className="py-3 px-4">Events</th>
                   <th className="py-3 px-4">Last Activity</th>
@@ -168,8 +168,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectCase, onNavigateTo
                         {c.status}
                       </span>
                     </td>
-                    <td className="py-3.5 px-4 font-medium text-slate-800">
-                      {c.latestDecision || '—'}
+                    <td className="py-3.5 px-4">
+                      {c.isOverridden && c.initialDecision && c.finalDecision ? (
+                        <span className="text-purple-900 font-semibold text-xs">
+                          Initial: <span className="font-mono">{c.initialDecision}</span> → Final: <span className="font-mono">{c.finalDecision}</span> <span className="text-[10px] bg-purple-100 text-purple-800 px-1.5 py-0.5 rounded font-bold uppercase">(override)</span>
+                        </span>
+                      ) : (
+                        <span className="font-medium text-slate-800">{c.latestDecision || '—'}</span>
+                      )}
                     </td>
                     <td className="py-3.5 px-4 font-mono text-xs">
                       {c.latestRiskScore != null ? `${c.latestRiskScore}/100` : '—'}

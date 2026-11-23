@@ -18,6 +18,9 @@ export interface CaseSummary {
   caseType: CaseType;
   subjectRef: string;
   status: CaseStatus;
+  initialDecision?: string | null;
+  finalDecision?: string | null;
+  isOverridden?: boolean;
   latestDecision: string | null;
   latestRiskScore: number | null;
   eventCount: number;

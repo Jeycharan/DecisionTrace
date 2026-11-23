@@ -1,0 +1,11 @@
+{
+  "name": "@decisiontrace/minibank",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "MiniBank - Minimal core loan originating application demonstrating DecisionTrace event ingestion",
+  "scripts": {
+    "start": "node --experimental-strip-types src/server.ts",
+    "dev": "node --experimental-strip-types src/server.ts"
+  }
+}
