@@ -12,6 +12,8 @@ import eventRoutes from './modules/events/event.routes';
 import caseRoutes from './modules/cases/case.routes';
 import verificationRoutes from './modules/verification/verification.routes';
 import checkpointRoutes from './modules/checkpoints/checkpoint.routes';
+import replayRoutes from './modules/replay/replay.routes';
+import reportRoutes from './modules/reports/report.routes';
 
 export function createApp(): express.Application {
   const app = express();
@@ -57,6 +59,8 @@ export function createApp(): express.Application {
   app.use('/api/v1/cases', caseRoutes);
   app.use('/api/v1/cases', verificationRoutes);
   app.use('/api/v1/cases', checkpointRoutes);
+  app.use('/api/v1/cases', replayRoutes);
+  app.use('/api/v1/cases', reportRoutes);
 
   // Global error handler (must be last)
   app.use(errorHandler);

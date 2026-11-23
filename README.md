@@ -133,9 +133,9 @@ Tests use **mongodb-memory-server** — no external MongoDB needed for tests.
 | Verification       | ✅ Done     | API + tamper detection tests |
 | Authentication     | ✅ Done     | JWT + API keys + RBAC        |
 | Dashboard          | ✅ Done     | React + Vite + Tailwind UI   |
-| Replay             | ⬜ Planned  | —                            |
-| ML + SHAP          | ⬜ Planned  | —                            |
-| PDF report         | ⬜ Planned  | —                            |
+| Replay             | ✅ Done     | Snapshot + versioned logic   |
+| ML + SHAP          | ✅ Done     | FastAPI + LogisticRegression |
+| PDF report         | ✅ Done     | HTML / PDF Printable Export  |
 
 ---
 

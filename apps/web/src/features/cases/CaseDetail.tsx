@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '../../lib/api';
-import { CaseSummary, LedgerEvent, VerificationResult, Checkpoint } from '../../types';
+import { CaseSummary, LedgerEvent, VerificationResult, Checkpoint, ReplayComparison } from '../../types';
 import {
   ArrowLeft,
   ShieldCheck,
@@ -15,6 +15,10 @@ import {
   ChevronUp,
   Bookmark,
   RefreshCw,
+  Play,
+  CheckCircle2,
+  GitCompare,
+  Printer,
 } from 'lucide-react';
 
 interface CaseDetailProps {
@@ -29,6 +33,8 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({ caseId, onBack }) => {
   const [loading, setLoading] = useState(true);
   const [verifying, setVerifying] = useState(false);
   const [verificationResult, setVerificationResult] = useState<VerificationResult | null>(null);
+  const [replaying, setReplaying] = useState(false);
+  const [replayResult, setReplayResult] = useState<ReplayComparison | null>(null);
   const [copiedHash, setCopiedHash] = useState<string | null>(null);
   const [expandedPayloads, setExpandedPayloads] = useState<Record<string, boolean>>({});
   const [activeTab, setActiveTab] = useState<'timeline' | 'checkpoints'>('timeline');
@@ -64,6 +70,35 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({ caseId, onBack }) => {
       console.error('Verification call failed:', err);
     } finally {
       setVerifying(false);
+    }
+  };
+
+  const handleReplay = async () => {
+    setReplaying(true);
+    try {
+      const res = await api.replayCase(caseId);
+      setReplayResult(res);
+    } catch (err) {
+      console.error('Replay failed:', err);
+    } finally {
+      setReplaying(false);
+    }
+  };
+
+  const handleExportReport = async () => {
+    const token = localStorage.getItem('dt_token');
+    try {
+      const res = await fetch(`/api/v1/cases/${encodeURIComponent(caseId)}/report`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      const html = await res.text();
+      const printWindow = window.open('', '_blank');
+      if (printWindow) {
+        printWindow.document.write(html);
+        printWindow.document.close();
+      }
+    } catch (err) {
+      console.error('Failed to export report:', err);
     }
   };
 
@@ -109,6 +144,13 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({ caseId, onBack }) => {
         </button>
 
         <div className="flex items-center gap-2">
+          <button
+            onClick={handleExportReport}
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700 hover:text-slate-900 bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm transition-colors"
+            title="Export Certified Audit Certificate"
+          >
+            <Printer className="w-3.5 h-3.5 text-sky-600" /> Export Audit Report (PDF)
+          </button>
           <span className="text-xs text-slate-500 font-mono">Tenant: {caseDoc.tenantId}</span>
           <button
             onClick={loadCaseData}
@@ -288,6 +330,128 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({ caseId, onBack }) => {
                 ))}
               </div>
             )}
+          </div>
+        )}
+
+        {/* Replay Trigger Banner */}
+        <div className="mt-4 flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rounded-xl bg-slate-50 border border-slate-200">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-sm">
+              <GitCompare className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 className="text-sm font-semibold text-slate-900">Deterministic Replay Engine</h2>
+              <p className="text-xs text-slate-500">
+                Execute the frozen decision snapshot against the exact historical underwriting ruleset.
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={handleReplay}
+            disabled={replaying}
+            className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-indigo-900 hover:bg-indigo-800 text-white text-xs font-semibold rounded-lg shadow-sm transition-colors disabled:opacity-50 shrink-0"
+          >
+            {replaying ? (
+              <>
+                <RefreshCw className="w-3.5 h-3.5 animate-spin" /> Evaluating Rules...
+              </>
+            ) : (
+              <>
+                <Play className="w-4 h-4 text-indigo-300" /> Replay Decision Logic
+              </>
+            )}
+          </button>
+        </div>
+
+        {/* Replay Result Breakdown */}
+        {replayResult && (
+          <div
+            className={`mt-4 p-4 rounded-xl border text-xs space-y-3 transition-all ${
+              replayResult.reproducible
+                ? 'bg-emerald-50/70 border-emerald-200 text-emerald-950'
+                : 'bg-amber-50/70 border-amber-200 text-amber-950'
+            }`}
+          >
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex items-center gap-2">
+                {replayResult.reproducible ? (
+                  <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+                ) : (
+                  <AlertOctagon className="w-5 h-5 text-amber-600 shrink-0" />
+                )}
+                <div>
+                  <span className="font-bold text-sm">
+                    {replayResult.reproducible
+                      ? '100% Deterministic Reproducibility Confirmed'
+                      : 'Logic Divergence or Historical Rule Unavailable'}
+                  </span>
+                  <span className="block text-[11px] opacity-80 mt-0.5 font-mono">
+                    Ruleset: {replayResult.rulesetId}@{replayResult.rulesetVersion} • Replayed at{' '}
+                    {new Date(replayResult.replayedAt).toLocaleTimeString()}
+                  </span>
+                </div>
+              </div>
+
+              <span className="px-2 py-0.5 rounded text-[11px] font-mono font-semibold uppercase tracking-wider bg-white/80 border border-current">
+                {replayResult.versionStatus}
+              </span>
+            </div>
+
+            {/* Comparison Pill Matrix */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-current/10">
+              <div className="bg-white/80 p-3 rounded-lg border border-slate-200 space-y-1 text-slate-800">
+                <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">
+                  Original Stored Outcome
+                </span>
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-sm">{replayResult.original.outcome}</span>
+                  {replayResult.original.riskScore != null && (
+                    <span className="text-xs font-mono text-slate-500">
+                      Score: {replayResult.original.riskScore}/100
+                    </span>
+                  )}
+                </div>
+                {replayResult.original.reasonCodes.length > 0 && (
+                  <div className="text-[10px] text-slate-500 font-mono">
+                    Reasons: {replayResult.original.reasonCodes.join(', ')}
+                  </div>
+                )}
+              </div>
+
+              <div className="bg-white/80 p-3 rounded-lg border border-slate-200 space-y-1 text-slate-800">
+                <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">
+                  Replayed Evaluation Output
+                </span>
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-sm">
+                    {replayResult.replayed ? replayResult.replayed.outcome : 'N/A'}
+                  </span>
+                  {replayResult.replayed?.riskScore != null && (
+                    <span className="text-xs font-mono text-slate-500">
+                      Score: {replayResult.replayed.riskScore}/100
+                    </span>
+                  )}
+                </div>
+                {replayResult.replayed?.reasonCodes && replayResult.replayed.reasonCodes.length > 0 && (
+                  <div className="text-[10px] text-slate-500 font-mono">
+                    Reasons: {replayResult.replayed.reasonCodes.join(', ')}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Explanation & Differences */}
+            <div className="text-[11px] leading-relaxed pt-1">
+              <p className="font-medium">{replayResult.explanation}</p>
+              {replayResult.differences.length > 0 && (
+                <ul className="list-disc pl-4 mt-1 space-y-0.5 text-rose-800 font-mono text-[10px]">
+                  {replayResult.differences.map((diff, dIdx) => (
+                    <li key={dIdx}>{diff}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
           </div>
         )}
       </div>

@@ -133,6 +133,13 @@ export const api = {
     });
   },
 
+  // Deterministic Decision Replay
+  async replayCase(caseId: string): Promise<import('../types').ReplayComparison> {
+    return request<import('../types').ReplayComparison>(`/cases/${encodeURIComponent(caseId)}/replay`, {
+      method: 'POST',
+    });
+  },
+
   // Checkpoints
   async getCaseCheckpoints(caseId: string): Promise<Checkpoint[]> {
     const token = getStoredToken();

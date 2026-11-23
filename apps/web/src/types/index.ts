@@ -84,6 +84,30 @@ export interface Checkpoint {
   createdAt: string;
 }
 
+export interface ReplayComparison {
+  caseId: string;
+  snapshotId: string | null;
+  sourceEventId: string;
+  rulesetId: string;
+  rulesetVersion: string;
+  modelVersion: string | null;
+  replayedAt: string;
+  versionStatus: 'VERSION_AVAILABLE' | 'VERSION_UNAVAILABLE';
+  reproducible: boolean;
+  original: {
+    outcome: string;
+    riskScore: number | null;
+    reasonCodes: string[];
+  };
+  replayed: {
+    outcome: string;
+    riskScore: number | null;
+    reasonCodes: string[];
+  } | null;
+  differences: string[];
+  explanation: string;
+}
+
 export interface ApiKeyMeta {
   _id: string;
   tenantId: string;
