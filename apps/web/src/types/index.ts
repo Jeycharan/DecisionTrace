@@ -21,6 +21,7 @@ export interface CaseSummary {
   initialDecision?: string | null;
   finalDecision?: string | null;
   isOverridden?: boolean;
+  sourceSystem?: string | null;
   latestDecision: string | null;
   latestRiskScore: number | null;
   eventCount: number;

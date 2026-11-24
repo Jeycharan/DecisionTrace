@@ -120,6 +120,7 @@ export async function ingestEvent(input: EventIngestionInput): Promise<IngestRes
           $setOnInsert: {
             caseType: input.caseType,
             subjectRef: input.subjectRef,
+            sourceSystem: input.sourceSystem,
             status: 'OPEN',
             latestDecision: null,
             latestRiskScore: null,

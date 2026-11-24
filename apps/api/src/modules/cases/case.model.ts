@@ -9,6 +9,7 @@ export interface ICase extends Document {
   initialDecision: string | null;
   finalDecision: string | null;
   isOverridden: boolean;
+  sourceSystem: string | null;
   latestDecision: string | null;
   latestRiskScore: number | null;
   eventCount: number;
@@ -38,6 +39,7 @@ const caseSchema = new Schema<ICase>(
     initialDecision: { type: String, default: null },
     finalDecision: { type: String, default: null },
     isOverridden: { type: Boolean, default: false },
+    sourceSystem: { type: String, default: null },
     latestDecision: { type: String, default: null },
     latestRiskScore: { type: Number, default: null },
     eventCount: { type: Number, default: 0 },
