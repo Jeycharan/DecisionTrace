@@ -5,8 +5,8 @@ import path from 'path';
 dotenv.config({ path: path.resolve(__dirname, '../../../../.env') });
 
 export const config = {
-  get port() { return parseInt(process.env.API_PORT || '5000', 10); },
-  get host() { return process.env.API_HOST || 'localhost'; },
+  get port() { return parseInt(process.env.PORT || process.env.API_PORT || '5000', 10); },
+  get host() { return process.env.API_HOST || '0.0.0.0'; },
   get nodeEnv() { return process.env.NODE_ENV || 'development'; },
   get isDev() { return (process.env.NODE_ENV || 'development') === 'development'; },
 
