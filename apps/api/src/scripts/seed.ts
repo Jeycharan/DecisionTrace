@@ -6,7 +6,7 @@ import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
 import path from 'path';
 
-dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+dotenv.config({ path: path.resolve(__dirname, '../../../../.env') });
 
 import { UserModel } from '../modules/auth/user.model';
 import { createApiKey } from '../modules/api-keys/api-key.service';
